@@ -17,9 +17,6 @@ drive.mount('/content/drive')
 - Document how you obtained it. For example, if from an API, show the request.
 """
 
-!pip install kagglehub
-
-!ls
 
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
