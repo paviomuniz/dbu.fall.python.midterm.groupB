@@ -1,5 +1,6 @@
 # This is a comment from Pávio Muniz
 
+<<<<<<< Updated upstream
 # hello
 
 
