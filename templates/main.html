@@ -1,13 +1,10 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main View</title>
-    <link rel="stylesheet" href="/static/main.css">
-</head>
-<body>
-    <h1>Midterm Group B Project</h1>
+{% extends 'base.html' %}
+{% block title %}
+Main
+{% endblock %}
+
+{% block content %}
+    <h1>Menu</h1>
     <nav>
         <ul>
             <li><a href="/EDA">EDA</a></li>
@@ -17,5 +14,4 @@
             <!-- <li><a href="/users">Users</a></li> -->
         </ul>
     </nav>
-</body>
-</html>
+{% endblock %}

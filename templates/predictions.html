@@ -1,19 +1,20 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDA View</title>
-    <link rel="stylesheet" href="/static/main.css">
-</head>
-<body>
-    <h1>Midterm Group B Project</h1>
+{% extends 'base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
     <h2>Predictions</h2>
-    <nav>
-        <ul>
-            <li><a href="/">Back</a></li>
-        </ul>
-    </nav>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Back</a></li>
+            </ul>
+        </nav>
+    </header>
     <section>
         <h2>Enter patient features</h2>
         <form action="/predictions" method="post">
@@ -150,6 +151,4 @@
             </div>
         {% endif %}
     </section>
-
-</body>
-</html>
+{% endblock %}
