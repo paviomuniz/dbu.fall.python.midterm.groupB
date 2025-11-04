@@ -1,6 +1,6 @@
 # This is a comment from Pávio Muniz
 
-<<<<<<< Updated upstream
+
 # hello
 
 
@@ -122,7 +122,7 @@ import os
 # import matplotlib.pyplot as plt
 # import requests
 from sklearn.linear_model import LinearRegression
-from flask import Flask, render_template, render_template_string, request
+from flask import Flask, render_template, render_template_string, request, jsonify
 import nbformat
 from nbconvert import HTMLExporter
 import os
@@ -216,6 +216,76 @@ def mod_predictions():
     return render_template('predictions.html')
 
     
+
+@app.route("/api/predict", methods=["POST"])
+def api_predict():
+    """JSON endpoint for predictions. Accepts POST with JSON data containing the 23 features.
+    Returns JSON with prediction or error message.
+    
+    Example request:
+    {
+        "Age": 45,
+        "Glucose": 120,
+        "Blood Pressure": 80,
+        ...
+    }
+
+    Returns:
+    {
+        "prediction": 123.45
+    }
+    or
+    {
+        "error": "Missing required field: Age"
+    }
+    """
+    model_path = os.path.join('model', 'linear_regression_model.pkl')
+
+    try:
+        # Get JSON data
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON data received"}), 400
+
+        # Required fields in exact order
+        required_fields = [
+            'Age', 'Glucose', 'Blood Pressure', 'Oxygen Saturation', 'Cholesterol',
+            'Triglycerides', 'HbA1c', 'Smoking', 'Alcohol', 'Physical Activity',
+            'Family History', 'Stress Level', 'Sleep Hours', 'BMI_BP_Interaction',
+            'Age_Stress_Interaction', 'Glucose_per_BMI', 'condition_arthritis',
+            'condition_asthma', 'condition_cancer', 'condition_diabetes',
+            'condition_healthy', 'condition_hypertension', 'condition_obesity'
+        ]
+
+        # Check for missing fields
+        missing = [field for field in required_fields if field not in data]
+        if missing:
+            return jsonify({"error": f"Missing required fields: {', '.join(missing)}"}), 400
+
+        # Convert all values to float in the exact order needed
+        try:
+            values = [float(data[field]) for field in required_fields]
+        except (ValueError, TypeError) as e:
+            return jsonify({"error": f"Invalid value format: {str(e)}"}), 400
+
+        if not os.path.exists(model_path):
+            return jsonify({"error": f"Model file not found: {model_path}"}), 500
+
+        # Load model and predict
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
+
+        prediction = model.predict([values])
+        try:
+            value = float(prediction[0])
+        except Exception:
+            value = float(prediction)
+
+        return jsonify({"prediction": value})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     if not os.path.exists("static"):

@@ -1,0 +1,28 @@
+POST http://localhost:5000/api/predict
+Content-Type: application/json
+
+{
+  "Age": 45,
+  "Glucose": 95,
+  "Blood Pressure": 130,
+  "Oxygen Saturation": 98,
+  "Cholesterol": 200,
+  "Triglycerides": 150,
+  "HbA1c": 5.7,
+  "Smoking": 0,
+  "Alcohol": 0,
+  "Physical Activity": 3,
+  "Family History": 1,
+  "Stress Level": 4,
+  "Sleep Hours": 7,
+  "BMI_BP_Interaction": 3900,
+  "Age_Stress_Interaction": 180,
+  "Glucose_per_BMI": 3.17,
+  "condition_arthritis": 0,
+  "condition_asthma": 0,
+  "condition_cancer": 1,
+  "condition_diabetes": 0,
+  "condition_healthy": 0,
+  "condition_hypertension": 0,
+  "condition_obesity": 0
+}
