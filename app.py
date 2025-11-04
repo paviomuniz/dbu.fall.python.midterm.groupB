@@ -5,22 +5,6 @@
 
 # comment from Chloe
 
-# practice edit
-
-# ------------------------------------------------------------------------------
-# MIDTERM PROJECT: DATA SCIENCE WITH PYTHON
-# ------------------------------------------------------------------------------
-#
-# 1. PROJECT OVERVIEW AND OBJECTIVES
-#
-#   1.1 Select a Dataset
-#       - Requirement: Choose a dataset not used in class. 
-#         It can come from public data repositories (e.g., Kaggle, 
-#         UCI Machine Learning Repository, government portals).
-#       - Tip: Pick a dataset that interests your group and has 
-#         enough complexity to warrant cleaning, EDA, and modeling.
-#
-#   1.2 Primary Goal
 #       - Apply data science concepts—data cleaning, visualization, modeling,
 #         and evaluation—to gain insights and showcase Python proficiency.
 #
@@ -125,3 +109,114 @@
 #
 # Good luck with your data exploration and modeling!
 # ------------------------------------------------------------------------------
+
+import os
+
+# import matplotlib
+
+# matplotlib.use("Agg")  # Use the Agg backend for non-GUI rendering
+# import datetime
+# import os
+
+# import matplotlib.pyplot as plt
+# import requests
+from sklearn.linear_model import LinearRegression
+from flask import Flask, render_template, render_template_string, request
+import nbformat
+from nbconvert import HTMLExporter
+import os
+import pickle
+
+app = Flask(__name__)
+
+
+
+@app.route("/")
+def home():
+    return render_template("main.html")
+
+@app.route("/EDA")
+def mod_eda():
+
+    notebook_path = 'eda\\MidTerm.ipynb'
+    
+    # Read the notebook
+    with open(notebook_path, 'r', encoding='utf-8') as f:
+        notebook_content = nbformat.read(f, as_version=4)
+
+    # Convert to HTML
+    html_exporter = HTMLExporter()
+    (body, resources) = html_exporter.from_notebook_node(notebook_content)
+
+    return render_template('notebook_viewer.html', notebook_html=body)
+
+    
+
+@app.route("/predictions", methods=["GET", "POST"])
+def mod_predictions():
+    model_path = os.path.join('model', 'linear_regression_model.pkl')
+
+    if request.method == "POST":
+        try:
+            # New feature list (order must match model training):
+            # ['Age', 'Glucose', 'Blood Pressure', 'Oxygen Saturation', 'Cholesterol',
+            #  'Triglycerides', 'HbA1c', 'Smoking', 'Alcohol', 'Physical Activity',
+            #  'Family History', 'Stress Level', 'Sleep Hours', 'BMI_BP_Interaction',
+            #  'Age_Stress_Interaction', 'Glucose_per_BMI', 'condition_arthritis',
+            #  'condition_asthma', 'condition_cancer', 'condition_diabetes',
+            #  'condition_healthy', 'condition_hypertension', 'condition_obesity']
+
+            age = float(request.form.get('Age', 0))
+            glucose = float(request.form.get('Glucose', 0))
+            bp = float(request.form.get('Blood Pressure', 0))
+            ox = float(request.form.get('Oxygen Saturation', 0))
+            chol = float(request.form.get('Cholesterol', 0))
+            trig = float(request.form.get('Triglycerides', 0))
+            hba1c = float(request.form.get('HbA1c', 0))
+            smoking = float(request.form.get('Smoking', 0))
+            alcohol = float(request.form.get('Alcohol', 0))
+            activity = float(request.form.get('Physical Activity', 0))
+            fh = float(request.form.get('Family History', 0))
+            stress = float(request.form.get('Stress Level', 0))
+            sleep = float(request.form.get('Sleep Hours', 0))
+            bmi_bp = float(request.form.get('BMI_BP_Interaction', 0))
+            age_stress = float(request.form.get('Age_Stress_Interaction', 0))
+            gluc_per_bmi = float(request.form.get('Glucose_per_BMI', 0))
+            cond_arthritis = float(request.form.get('condition_arthritis', 0))
+            cond_asthma = float(request.form.get('condition_asthma', 0))
+            cond_cancer = float(request.form.get('condition_cancer', 0))
+            cond_diabetes = float(request.form.get('condition_diabetes', 0))
+            cond_healthy = float(request.form.get('condition_healthy', 0))
+            cond_hyper = float(request.form.get('condition_hypertension', 0))
+            cond_obesity = float(request.form.get('condition_obesity', 0))
+
+            X = [[age, glucose, bp, ox, chol, trig, hba1c, smoking, alcohol,
+                  activity, fh, stress, sleep, bmi_bp, age_stress, gluc_per_bmi,
+                  cond_arthritis, cond_asthma, cond_cancer, cond_diabetes,
+                  cond_healthy, cond_hyper, cond_obesity]]
+
+            if not os.path.exists(model_path):
+                return render_template('predictions.html', error=f"Model file not found: {model_path}")
+
+            with open(model_path, 'rb') as f:
+                model = pickle.load(f)
+
+            prediction = model.predict(X)
+            try:
+                value = float(prediction[0])
+            except Exception:
+                value = float(prediction)
+
+            return render_template('predictions.html', result=value)
+
+        except Exception as e:
+            return render_template('predictions.html', error=str(e))
+
+    return render_template('predictions.html')
+
+    
+
+if __name__ == "__main__":
+    if not os.path.exists("static"):
+        os.mkdir("static")
+    app.run(debug=True)

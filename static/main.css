@@ -1,0 +1,8 @@
+body { font-family: Arial, sans-serif; background-color: #f0f4f8; color: #333; display: flex; align-items: center; flex-direction: column; }
+h1 { color: #4a90e2; }
+form { margin: 20px 0; }
+input[type="text"] { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 250px; }
+button { padding: 10px 20px; background-color: #4a90e2; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+.error { color: red; }
+.graph-container { margin-top: 20px; }
+img { max-width: 100%; height: auto; }

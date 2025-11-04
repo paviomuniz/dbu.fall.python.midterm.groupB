@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDA View</title>
+    <link rel="stylesheet" href="/static/main.css">
+</head>
+<body>
+    <h1>Midterm Group B Project</h1>
+    <h2>Predictions</h2>
+    <nav>
+        <ul>
+            <li><a href="/">Back</a></li>
+        </ul>
+    </nav>
+    <section>
+        <h2>Enter patient features</h2>
+        <form action="/predictions" method="post">
+            <div class="form-row">
+                <label for="age">Age</label>
+                <input id="age" name="Age" type="number" step="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="glucose">Glucose</label>
+                <input id="glucose" name="Glucose" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="bp">Blood Pressure</label>
+                <input id="bp" name="Blood Pressure" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="ox">Oxygen Saturation</label>
+                <input id="ox" name="Oxygen Saturation" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="chol">Cholesterol</label>
+                <input id="chol" name="Cholesterol" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="trig">Triglycerides</label>
+                <input id="trig" name="Triglycerides" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="hba1c">HbA1c</label>
+                <input id="hba1c" name="HbA1c" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="smoking">Smoking</label>
+                <input id="smoking" name="Smoking" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="alcohol">Alcohol</label>
+                <input id="alcohol" name="Alcohol" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="activity">Physical Activity</label>
+                <input id="activity" name="Physical Activity" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="fh">Family History</label>
+                <input id="fh" name="Family History" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="stress">Stress Level</label>
+                <input id="stress" name="Stress Level" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="sleep">Sleep Hours</label>
+                <input id="sleep" name="Sleep Hours" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="bmi_bp">BMI_BP_Interaction</label>
+                <input id="bmi_bp" name="BMI_BP_Interaction" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="age_stress">Age_Stress_Interaction</label>
+                <input id="age_stress" name="Age_Stress_Interaction" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="gluc_per_bmi">Glucose_per_BMI</label>
+                <input id="gluc_per_bmi" name="Glucose_per_BMI" type="number" step="any" required>
+            </div>
+
+            <div class="form-row">
+                <label for="cond_arthritis">condition_arthritis</label>
+                <input id="cond_arthritis" name="condition_arthritis" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="cond_asthma">condition_asthma</label>
+                <input id="cond_asthma" name="condition_asthma" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="cond_cancer">condition_cancer</label>
+                <input id="cond_cancer" name="condition_cancer" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="cond_diabetes">condition_diabetes</label>
+                <input id="cond_diabetes" name="condition_diabetes" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="cond_healthy">condition_healthy</label>
+                <input id="cond_healthy" name="condition_healthy" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="cond_hyper">condition_hypertension</label>
+                <input id="cond_hyper" name="condition_hypertension" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <label for="cond_obesity">condition_obesity</label>
+                <input id="cond_obesity" name="condition_obesity" type="number" step="1" min="0" max="1" required>
+            </div>
+
+            <div class="form-row">
+                <button type="submit">Predict</button>
+            </div>
+        </form>
+        {% if result is defined %}
+            <div class="result">
+                <h3>Prediction to the Length of Stay result</h3>
+                <p>{{ result }}</p>
+            </div>
+        {% endif %}
+
+        {% if error is defined %}
+            <div class="error">
+                <h3>Error</h3>
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+    </section>
+
+</body>
+</html>
