@@ -1,19 +1,19 @@
+<!doctype html>
 {% extends 'base.html' %}
 {% block title %}
-EDA
+EDA - Jupyter Notebook Interactions
 {% endblock %}
 
 {% block content %}
-    <h2>EDA</h2>
+    <h1>EDA - Jupyter Notebook Interactions</h1>
+    <header>
         <nav>
-        <ul>
-            <li><a href="/">Back</a></li>
-            <!-- <li><a href="/info">Info</a></li> -->
-            <!-- <li><a href="/multiply">Multiply</a></li> -->
-            <!-- <li><a href="/fruits">Fruits</a></li> -->
-            <!-- <li><a href="/users">Users</a></li> -->
-        </ul>
-    </nav>
+            <ul>
+                <li><a href="/">Back</a></li>
+
+            </ul>
+        </nav>
+    </header>
     <section>
     {{ notebook_html | safe }}
     </section>
