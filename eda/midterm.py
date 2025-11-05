@@ -1,35 +1,41 @@
-#%%
+
 ##**2.1 Acquire, Clean, and Preprocess Data**
-#%%
+"""
+(a) Data Acquisition
+- Identify your data source: file-based (CSV, JSON), database, API, etc.
+- Document how you obtained it. For example, if from an API, show the request.
+"""
+
+#!pip install kagglehub
+
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.model_selection import train_test_split
 
-#%%
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 import pandas as pd
 import os
 # Download latest version
-# file_path = kagglehub.dataset_download("kanchana1990/adzuna-global-job-listings-2025")
 file_path = kagglehub.dataset_download("abdallaahmed77/healthcare-risk-factors-dataset")
 
 print("Path to dataset files:", file_path)
 # !ls {file_path}
-#%%
-# csv_path = os.path.join(file_path, "adzuna_global_job_listings_2025.csv")
+
+"""##Check if file id loaded correctly."""
+
 csv_path = os.path.join(file_path, "dirty_v3_path.csv")
 df = pd.read_csv(csv_path)
 print(df.head())
-#%%
-#checking missing values
-print("\n---Missing Data Check---")
-print(df.isnull().sum())
-missing_data_col = df.columns[df.isnull().sum()>0]
-print(missing_data_col)
-#%%
+
+"""(b) Data Cleaning
+- Tasks: Handle missing values, remove duplicates, correct invalid entries.
+- Python Tools: pandas methods (isnull, dropna, fillna, etc.).
+- Tips: Always justify your decisions, e.g., why dropping vs. imputing missing values.
+"""
+
 # 1. Check for missing values II
 print("Missing values per column:")
 print(df.isnull().sum())
@@ -47,6 +53,7 @@ print("\nDuplicate rows:")
 print(duplicates)
 
 # 5. Drop rows with missing values
+# medical condition is a highly related feature, it doesn't has any pattern, imputing missing data might impact the resualt accurate.
 df = df.dropna()
 
 # 6. Confirm it's clean
@@ -57,21 +64,13 @@ print("Shape after cleaning:", df.shape)
 # Optional: show info about types
 print("\nData types after cleaning:")
 print(df.info())
-#%%
-#checking duplicates
-print("\n---Duplicate Data Check---")
-has_duplicates = df.duplicated().any()
-print("Are there any duplicate records?", has_duplicates)
 
-#show rows with duplicates
-duplicates = df[df.duplicated(keep=False)]
-print(duplicates)
+"""(c) Data Preprocessing
+- Requirement: Use at least 2 preprocessing techniques (scaling, encoding, feature engineering, etc.).
+- Tips: Ensure numeric vs. categorical variables are appropriately transformed.
 
-#medical condition is a highly related feature, it doesn't has any pattern, imputing missing data might impact the resualt accurate.
-#droping or filling missing data
-df = df.dropna()
-print(df.isnull().sum())
-#%%
+"""
+
 # Choose your approach: 'tfidf' or 'count'
 approach = 'tfidf'  # Change to 'count' for simple word counts
 
@@ -104,21 +103,31 @@ title_df = pd.DataFrame(
     index=df.index
 )
 print(title_df.head())
-#%%
+
 df['BMI_BP_Interaction'] = df['BMI'] * df['Blood Pressure']
 df['Age_Stress_Interaction'] = df['Age'] * df['Stress Level']
 df['Glucose_per_BMI'] = df['Glucose'] / (df['BMI'] + 1)
 
 df[['BMI_BP_Interaction', 'Age_Stress_Interaction', 'Glucose_per_BMI']].head()
-#%%
+
+"""##**2.2 Perform Exploratory Data Analysis (EDA) and Visualize Key Insights**
+
+(a) Exploratory Data Analysis
+- Compute basic stats (mean, median, std, etc.).
+- Identify correlations, outliers, or data imbalances.
+- Use pandas describe(), info(), corr() for an overview.
+"""
+
 print("---Dataset Overview---")
 print(df.info())
 #basic stats (mean,median,std)
 print(df.describe())
 
+print("---Date Correlation---")
 print(df.select_dtypes(exclude=['object', 'string']).corr())
-#%%
+
 df['Medical Condition'].value_counts()
+
 gender_count = df['Gender'].value_counts()
 gender_percent = df['Gender'].value_counts(normalize=True) * 100
 gender_summary = pd.DataFrame({
@@ -126,10 +135,8 @@ gender_summary = pd.DataFrame({
     'Percentage': gender_percent.round(2)
 })
 print(gender_summary)
-#%%
+
 #Identify correlations, outliers, or data imbalances.
-
-
 numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 analysis_df = pd.concat([df[numeric_cols], title_df], axis=1)
 
@@ -150,7 +157,7 @@ plot_matrix = correlation_matrix.loc[
 ]
 
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 8))
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(18, 25))
 
 sns.heatmap(
     plot_matrix,
@@ -223,7 +230,7 @@ print(f"  {strongest_pos.index[0]}: {strongest_pos.values[0]:.4f}")
 
 print(f"\nStrongest negative correlation with Glucose:")
 print(f"  {strongest_neg.index[0]}: {strongest_neg.values[0]:.4f}")
-#%%
+
 # Select numeric columns for correlation analysis
 numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 
@@ -231,7 +238,7 @@ numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
 correlation_matrix = df[numeric_cols].corr()
 
 # Create figure with larger size for better readability
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(15, 15))
 
 # Create heatmap
 sns.heatmap(correlation_matrix,
@@ -250,7 +257,9 @@ plt.xticks(rotation=45, ha='right')
 plt.yticks(rotation=0)
 plt.tight_layout()
 plt.show()
-#%%
+
+#Identify the pattern between Length of Stay with all other numberical featueres
+
 key_features = [
     'Age','Glucose','Blood Pressure','BMI','Oxygen Saturation', 'Cholesterol','Triglycerides','HbA1c','Diet Score',
     'Stress Level', 'Physical Activity', 'Age_Stress_Interaction', 'Sleep Hours'
@@ -267,7 +276,13 @@ for i, feature in enumerate(key_features, 1):
 plt.suptitle('Length of Stay vs Key Health Indicators', fontsize=16, fontweight='bold', y=1)
 plt.tight_layout()
 plt.show()
-#%%
+
+"""(b) Data Visualization
+- Requirement: At least 3 different visualization techniques (histogram, scatter plot, box plot, heatmap, etc.).
+- Tips: Use clear labels, titles, and legends. Let visuals drive your EDA narrative.
+
+"""
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -301,26 +316,24 @@ plt.ylabel('Blood Pressure')
 plt.legend(title='Stress Level')
 plt.show()
 
+"""##**2.3 Build and Evaluate a Machine Learning Model**
 
-key_features = ['Age', 'BMI', 'Glucose', 'Blood Pressure', 'Stress Level', 'LengthOfStay']
-sns.pairplot(df[key_features], diag_kind='kde', plot_kws={'alpha':0.5})
-plt.suptitle('Pairwise Relationships Between Key Health Indicators', y=1.02, fontsize=14, fontweight='bold')
-plt.show()
+(a) Model Building
+- Requirement: At least 2 different ML algorithms (e.g., Logistic Regression, Random Forest, Linear Regression, etc.).
+- Tips: Match the algorithm type to your target variable (classification vs. regression).
 
-key_features = ['Blood Pressure','Oxygen Saturation', 'Cholesterol','Stress Level', 'Physical Activity','Age_Stress_Interaction','Sleep Hours','LengthOfStay']
-sns.pairplot(df[key_features], diag_kind='kde', plot_kws={'alpha':0.5})
-plt.suptitle('Pairwise Relationships Between Key Health Indicators', y=1.02, fontsize=14, fontweight='bold')
-plt.show()
-#%%
+#Random Forest
+"""
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 import pickle
-#%%
+
 df_condition = pd.DataFrame(condition_features)
-#%%
+
 # Define features (X) and target (y)
 # Drop the target variable and the original categorical columns
 X = df.drop(columns=[
@@ -350,7 +363,7 @@ model = RandomForestRegressor(n_estimators=500, random_state=42, n_jobs=-1, max_
 print("Training Random Forest Regressor...")
 model.fit(X_train, y_train)
 print("Training complete.")
-#%%
+
 # 2. Prediction and Evaluation
 y_pred = model.predict(X_test)
 
@@ -366,58 +379,63 @@ print("\n--- Model Evaluation (Random Forest Regressor) ---")
 print(f"Mean Absolute Error (MAE): {mae:.4f} days")
 print(f"Root Mean Squared Error (RMSE): {rmse:.4f} days")
 print(f"R-squared (R2): {r2:.4f}")
-#%%
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score
-from sklearn.model_selection import train_test_split
-import pandas as pd
 
-# Define parameter ranges to test
-n_estimators_list = [50, 100, 200, 500]
-max_depth_list = [5, 10, 20, None]
+"""
+test the best parameter value for random forest model
+"""
+# from sklearn.ensemble import RandomForestRegressor
+# from sklearn.metrics import r2_score
+# from sklearn.model_selection import train_test_split
+# import pandas as pd
 
-results = []
+# # Define parameter ranges to test
+# n_estimators_list = [50, 100, 200, 500]
+# max_depth_list = [5, 10, 20, None]
 
-# Loop through combinations
-for n in n_estimators_list:
-    for d in max_depth_list:
-        model = RandomForestRegressor(
-            n_estimators=n,
-            max_depth=d,
-            min_samples_leaf=5,
-            random_state=42,
-            n_jobs=-1
-        )
+# results = []
 
-        model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
-        r2 = r2_score(y_test, y_pred)
+# # Loop through combinations
+# for n in n_estimators_list:
+#     for d in max_depth_list:
+#         model = RandomForestRegressor(
+#             n_estimators=n,
+#             max_depth=d,
+#             min_samples_leaf=5,
+#             random_state=42,
+#             n_jobs=-1
+#         )
 
-        results.append({
-            'n_estimators': n,
-            'max_depth': d,
-            'r2_score': r2
-        })
-        print(f"n_estimators={n}, max_depth={d}, R²={r2:.4f}")
-#%%
+#         model.fit(X_train, y_train)
+#         y_pred = model.predict(X_test)
+#         r2 = r2_score(y_test, y_pred)
+
+#         results.append({
+#             'n_estimators': n,
+#             'max_depth': d,
+#             'r2_score': r2
+#         })
+#         print(f"n_estimators={n}, max_depth={d}, R²={r2:.4f}")
+
 # 3. Feature Importance Analysis
 # This will show which features, including the Medical Condition dummies, are most influential.
 feature_importances = pd.Series(model.feature_importances_, index=X.columns)
-top_10_features = feature_importances.nlargest(10)
+rf_top_10_features = feature_importances.nlargest(10)
 
-print("\n--- Top 10 Feature Importances ---")
-print(top_10_features.to_markdown(numalign="left", stralign="left"))
+print("\n--- Random Forest Model Top 10 Feature Importances ---")
+print(rf_top_10_features.to_markdown(numalign="left", stralign="left"))
 
 # Save the feature importances to a file for documentation
 with open('feature_importances.txt', 'w') as f:
-    f.write(top_10_features.to_markdown(numalign="left", stralign="left"))
+    f.write(rf_top_10_features.to_markdown(numalign="left", stralign="left"))
 
 # Save the trained model (optional, but good practice)
 with open('random_forest_model.pkl', 'wb') as f:
     pickle.dump(model, f)
 
 print("\nModel training and evaluation complete. Results saved.")
-#%%
+
+"""#Linear Regression"""
+
 from sklearn.linear_model import LinearRegression
 from sklearn.impute import SimpleImputer
 import numpy as np
@@ -435,9 +453,6 @@ lr_model = LinearRegression()
 lr_model.fit(X_train_imputed , y_train)
 y_pred_lr = lr_model.predict(X_test_imputed )
 
-# lr_mae = mean_absolute_error(y_test, np.round(y_pred_lr))
-# lr_rmse = np.sqrt(mean_squared_error(y_test, np.round(y_pred_lr)))
-# lr_r2 = r2_score(y_test, np.round(y_pred_lr))
 
 lr_mae = mean_absolute_error(y_test, y_pred_lr)
 lr_rmse = np.sqrt(mean_squared_error(y_test, y_pred_lr))
@@ -446,26 +461,19 @@ lr_r2 = r2_score(y_test, y_pred_lr)
 print("lr_mae:", lr_mae)
 print("lr_rmse:", lr_rmse)
 print("lr_r2:", lr_r2)
-#%%
-rf_mae = mean_absolute_error(y_test, y_pred_rf_rounded)
-rf_rmse = np.sqrt(mean_squared_error(y_test, y_pred_rf_rounded))
-rf_r2 = r2_score(y_test, y_pred_rf_rounded)
 
-print("\n--- Model Evaluation Comparison ---")
-print(f"{'Model':<20}{'MAE':<15}{'RMSE':<15}{'R²':<15}")
-print("-"*65)
-print(f"{'Random Forest':<20}{rf_mae:<15.4f}{rf_rmse:<15.4f}{rf_r2:<15.4f}")
-print(f"{'Linear Regression':<20}{lr_mae:<15.4f}{lr_rmse:<15.4f}{lr_r2:<15.4f}")
+feature_importances = pd.Series(
+    np.abs(lr_model.coef_),  # use absolute value of coefficients
+    index=X.columns
+)
 
-print("\n--- Interpretation ---")
-print(f"• The Random Forest model achieved an MAE of {rf_mae:.2f} and RMSE of {rf_rmse:.2f}, "
-      f"indicating that on average, predictions are off by about {rf_mae:.2f} days.")
-print("• The R² score shows how much variation in hospital stay is explained by the model; "
-      f"Random Forest (R² = {rf_r2:.2f}) captures more variance than Linear Regression (R² = {lr_r2:.2f}).")
-print("• Random Forest’s non-linear structure better handles complex health factor interactions, "
-      "while Linear Regression assumes simple linear relationships, leading to weaker performance.")
+lr_top_10_features = feature_importances.nlargest(10)
 
-#%%
+print("--Linear Regression Model Top 10 Important Features--")
+print(lr_top_10_features)
+
+"""#XGBoost"""
+
 from xgboost import XGBRegressor
 
 # 2. Model Selection: XGBoost Regressor
@@ -497,76 +505,49 @@ print(f"R-squared (R2): {xgb_r2:.4f}")
 xgb_feature_importances = pd.Series(xgb_model.feature_importances_, index=X.columns)
 xgb_top_10_features = xgb_feature_importances.nlargest(10)
 
-print("\n--- Top 10 Feature Importances (XGBoost) ---")
+print("\n--- XGBoost Model Top 10 Feature Importances ---")
 print(xgb_top_10_features.to_markdown(numalign="left", stralign="left"))
 
 # Compare with other models
 print("\n--- Model Evaluation Comparison ---")
 print(f"{'Model':<20}{'MAE':<15}{'RMSE':<15}{'R²':<15}")
 print("-"*65)
-print(f"{'Random Forest':<20}{rf_mae:<15.4f}{rf_rmse:<15.4f}{rf_r2:<15.4f}")
+print(f"{'Random Forest':<20}{mae:<15.4f}{rmse:<15.4f}{r2:<15.4f}")
 print(f"{'Linear Regression':<20}{lr_mae:<15.4f}{lr_rmse:<15.4f}{lr_r2:<15.4f}")
 print(f"{'XGBoost':<20}{xgb_mae:<15.4f}{xgb_rmse:<15.4f}{xgb_r2:<15.4f}")
 
-print("\n--- Interpretation ---")
-print(f"• The Random Forest model achieved an MAE of {rf_mae:.2f} and RMSE of {rf_rmse:.2f}, "
-      f"indicating that on average, predictions are off by about {rf_mae:.2f} days.")
-print("• The Linear Regression model achieved an MAE of {lr_mae:.2f} and RMSE of {lr_rmse:.2f}, "
-      f"indicating that on average, predictions are off by about {lr_mae:.2f} days.")
-print(f"• The XGBoost model achieved an MAE of {xgb_mae:.2f} and RMSE of {xgb_rmse:.2f}, "
-      f"indicating that on average, predictions are off by about {xgb_mae:.2f} days.")
-print("• The R² score shows how much variation in hospital stay is explained by the model; "
-      f"Random Forest (R² = {rf_r2:.2f}) and XGBoost (R² = {xgb_r2:.2f}) capture more variance than Linear Regression (R² = {lr_r2:.2f}).")
-print("• Random Forest’s and XGBoost's non-linear structure better handles complex health factor interactions, "
-      "while Linear Regression assumes simple linear relationships, leading to weaker performance.")
-#%%
+
+"""(b) Model Evaluation
+- Requirement: At least 2 different evaluation metrics (accuracy, precision/recall, F1, RMSE, MAE, etc.).
+- Tips: Present numeric results and interpret them in plain English.
+Consider basic hyperparameter tuning.
+
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
-print("\n=== PREDICTION DASHBOARD ===")
+print("\n=== Model Evaluation Dashboard ===")
 
 # 1. Model performance summary table
 dashboard_metrics = pd.DataFrame({
     'Model': ['Random Forest', 'Linear Regression', 'XGBoost'],
-    'MAE (avg days off)': [rf_mae, lr_mae, xgb_mae],
-    'RMSE (error size)': [rf_rmse, lr_rmse, xgb_rmse],
-    'R² (explained variance)': [rf_r2, lr_r2, xgb_r2]
+    'MAE (avg days off)': [mae, lr_mae, xgb_mae],
+    'RMSE (error size)': [rmse, lr_rmse, xgb_rmse],
+    'R² (variance)': [r2, lr_r2, xgb_r2]
 })
 
 print("\nModel Performance Summary:")
-display(dashboard_metrics.round(3))  # shows a nice table in Colab
+display(dashboard_metrics.round(3))  
 
-# 2. Top 5 most important features from Random Forest
-rf_feature_importances = pd.Series(
-    model.feature_importances_,
-    index=X.columns
-).sort_values(ascending=False).head(5)
+#2. Top 10 important features comparison
 
-print("\nTop 5 Drivers of LengthOfStay (Random Forest Feature Importance):")
-display(rf_feature_importances.to_frame('importance').round(4))
+print("\n===Top 10 Important Features Comparison===")
 
-# 3. Bar chart of those top features
-plt.figure(figsize=(6,4))
-rf_feature_importances.sort_values().plot(kind='barh', color='skyblue')
-plt.title('Top 5 Features Impacting Length of Stay')
-plt.xlabel('Importance (Higher = more impact)')
-plt.ylabel('Feature')
-plt.tight_layout()
-plt.show()
+df_importance = pd.DataFrame({
+    'Random Forest': rf_top_10_features.index,
+    'Linear Regression': lr_top_10_features.index,
+    'XGBoost': rf_top_10_features.index
+})
+print(df_importance)
 
-# 4. Business interpretation
-print("\nBusiness Notes:")
-print(f"- Random Forest MAE is {rf_mae:.2f}, so we're off by ~{rf_mae:.2f} days per patient on average.")
-print("- The features above are the most predictive of how long a patient stays.")
-print("- This helps hospitals plan beds, staffing, and costs more efficiently.")
-#%%
-#Saving the best model
-
-# Save the model
-filename = '..\\model\\linear_regression_model.pkl'
-with open(filename, 'wb') as file:
-    pickle.dump(lr_model, file)
-#%%
-#%%
-#%%
-#%%
