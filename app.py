@@ -121,12 +121,14 @@ import os
 
 # import matplotlib.pyplot as plt
 # import requests
-from sklearn.linear_model import LinearRegression
-from flask import Flask, render_template, render_template_string, request, jsonify
+# from sklearn.linear_model import LinearRegression
+import pickle
+from flask import Flask, render_template, request, jsonify
+# render_template_string
 import nbformat
 from nbconvert import HTMLExporter
-import os
-import pickle
+# import os
+import requests
 
 app = Flask(__name__)
 
@@ -151,7 +153,6 @@ def mod_eda():
 
     return render_template('notebook_viewer.html', notebook_html=body)
 
-    
 
 @app.route("/predictions", methods=["GET", "POST"])
 def mod_predictions():
@@ -214,6 +215,76 @@ def mod_predictions():
             return render_template('predictions.html', error=str(e))
 
     return render_template('predictions.html')
+
+
+@app.route("/flask_api", methods=["GET", "POST"])
+def mod_api_predictions():
+    
+    if request.method == "POST":
+        try:
+            # New feature list (order must match model training):
+            age = float(request.form.get('Age', 0))
+            glucose = float(request.form.get('Glucose', 0))
+            bp = float(request.form.get('Blood Pressure', 0))
+            ox = float(request.form.get('Oxygen Saturation', 0))
+            chol = float(request.form.get('Cholesterol', 0))
+            trig = float(request.form.get('Triglycerides', 0))
+            hba1c = float(request.form.get('HbA1c', 0))
+            smoking = float(request.form.get('Smoking', 0))
+            alcohol = float(request.form.get('Alcohol', 0))
+            activity = float(request.form.get('Physical Activity', 0))
+            fh = float(request.form.get('Family History', 0))
+            stress = float(request.form.get('Stress Level', 0))
+            sleep = float(request.form.get('Sleep Hours', 0))
+            bmi_bp = float(request.form.get('BMI_BP_Interaction', 0))
+            age_stress = float(request.form.get('Age_Stress_Interaction', 0))
+            gluc_per_bmi = float(request.form.get('Glucose_per_BMI', 0))
+            cond_arthritis = float(request.form.get('condition_arthritis', 0))
+            cond_asthma = float(request.form.get('condition_asthma', 0))
+            cond_cancer = float(request.form.get('condition_cancer', 0))
+            cond_diabetes = float(request.form.get('condition_diabetes', 0))
+            cond_healthy = float(request.form.get('condition_healthy', 0))
+            cond_hyper = float(request.form.get('condition_hypertension', 0))
+            cond_obesity = float(request.form.get('condition_obesity', 0))
+
+            X = {           
+                "Age": age,
+                "Glucose": glucose,
+                "Blood Pressure": bp,
+                "Oxygen Saturation": ox,
+                "Cholesterol": chol,
+                "Triglycerides": trig,
+                "HbA1c": hba1c,
+                "Smoking": smoking,
+                "Alcohol": alcohol,
+                "Physical Activity": activity,
+                "Family History": fh,
+                "Stress Level": stress,
+                "Sleep Hours": sleep,
+                "BMI_BP_Interaction": bmi_bp,
+                "Age_Stress_Interaction": age_stress,
+                "Glucose_per_BMI": gluc_per_bmi,
+                "condition_arthritis": cond_arthritis,
+                "condition_asthma": cond_asthma,
+                "condition_cancer": cond_cancer,
+                "condition_diabetes": cond_diabetes,
+                "condition_healthy": cond_healthy,
+                "condition_hypertension": cond_hyper,
+                "condition_obesity": cond_obesity
+            }
+            response = requests.post(
+                request.url_root + "api/predict",
+                headers={"Content-Type": "application/json"},
+                json=X,
+                timeout=30
+            )
+
+            return jsonify(response.json())
+
+        except Exception as e:
+            return render_template('api.html', error=str(e))
+
+    return render_template('api.html')
 
     
 
