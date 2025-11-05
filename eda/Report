@@ -1,17 +1,83 @@
+Outine For Word Document
+
 1) Introduction to the Dataset
-This dataset is a synthetic dataset for healthcare risk factor analysis. It originally  ontains 30,000 records and 20 features related to individuals' health conditions. The goal of our project is to develop a predictive model that can estimate how long (days) a patient is likely to stay in the hospital. The prediction is aim to improve patient flow and operational efficiency, as hospitals operate with limited resources such as beds, staff, medical equipments,etc.
+
+This dataset is a synthetic healthcare dataset containing 30,000 records and 20 features related to patients’ health conditions and lifestyle factors. Each record represents an individual with variables such as age, gender, medical condition, blood pressure, glucose, cholesterol, stress level, and others.
+The objective of this project is to develop a predictive model that estimates the Length of Stay (in days) for patients in hospitals. Accurately predicting hospital stays helps improve resource allocation, bed management, and operational efficiency, which are crucial for healthcare systems operating under limited capacity.
 
 2) Data Cleaning & Preprocessing Steps
-We did missing data check, duplicates data check. There are 4500 records with missing data, and we removed those missing data. Because medical condition is a highly related feature, it doesn't has any pattern, imputing missing data might impact the accurate.
 
-3) EDA & Key Insights
-We conclude that the medical condition influence the days of stay most of the time, and Cancer is the top conditoin fature that define the number of days in hospital.  
+Data preprocessing began with thorough data quality checks, including missing value detection, duplicate removal, and outlier assessment.
+
+A total of 4,500 records were found to have missing data.
+
+These were removed instead of imputed because “Medical Condition”, a key categorical feature, showed no systematic missingness pattern. Imputing could have introduced bias and reduced model reliability.
+
+Additional preprocessing included:
+
+Dropping irrelevant or noisy columns such as random_notes and noise_col.
+
+Encoding categorical variables (e.g., “Medical Condition”) into dummy variables for model compatibility.
+
+Creating interaction features like Glucose_per_BMI and Age_Stress_Interaction to capture non-linear relationships.
+
+Splitting the dataset into training (80 percent) and testing (20 percent) sets.
+
+3) Exploratory Data Analysis (EDA) & Key Insights
+
+EDA was conducted using histograms, boxplots, scatterplots, and heatmaps to explore relationships between key health metrics and hospital stay duration.
+
+Key findings:
+
+Glucose levels followed a slightly right-skewed distribution, indicating a subset of patients with higher-than-average glucose.
+
+Length of Stay varied significantly across Medical Conditions, with Cancer patients showing the longest average stays.
+
+A scatterplot between BMI and Blood Pressure, colored by Stress Level, revealed a positive correlation — higher BMI and stress levels often coincide with increased blood pressure.
+
+Further visualization of cancer-specific data showed that Blood Pressure, Oxygen Saturation, and Physical Activity correlate moderately with hospital stay duration.
+
+Summary Insight:
+Among all factors, Medical Condition, particularly Cancer, was the dominant driver of hospital stay length. This aligns with medical expectations, as cancer treatment typically requires extended hospitalization.
 
 4) Model Building & Evaluation
-We trained models with 3 different ML algorithms. Since the predictive variable of our project is length of days, which is a numerical feature. We selected random forest, linear regression and XGBoost (Extreme Gradient Boosting).
-We use MAE (Mean Absolute Error), RMSE (Root Mean Squared Error) and R^2 (Coefficient of Determination) as three result evaluation metrics. Random Forest model has the lowest MAE (1.2389), which means on average it predicts slightly closer to true values than the rest of two. Linear Regression has the lowest RMSE (1.5768), which means its large mistakes are less than the other two. Linear regression is also has the highest R^2 (0.682), which means 68.2% variation in hospital stay length.
+
+Since the target variable (LengthOfStay) is continuous, this was treated as a regression problem. Three machine learning models were built and evaluated:
+
+Model	MAE (avg days off)	RMSE (error size)	R² (variance explained)
+Random Forest	1.2389	1.6055	0.6704
+Linear Regression	1.2627	1.5768	0.6821
+XGBoost	1.2613	1.6419	0.6553
+
+Evaluation Metrics Used:
+
+MAE (Mean Absolute Error): Average absolute difference between predictions and actual values.
+
+RMSE (Root Mean Squared Error): Penalizes larger errors more heavily; lower is better.
+
+R² (Coefficient of Determination): Measures how much variance in hospital stay length the model explains.
+
+Feature Importance Analysis:
+
+Across all models, Medical Condition (Cancer) was consistently the most influential predictor.
+
+Other significant features included Stress Level, Blood Pressure, and Physical Activity.
+
+Interpretation:
+While all three models performed similarly, Linear Regression achieved the highest R² and lowest RMSE, suggesting it best balances interpretability and accuracy. Random Forest provided slightly better MAE (closer average predictions), but its variance was higher. XGBoost, while powerful, did not outperform the simpler models in this context.
 
 5) Conclusion
-Considering it is designed for hospital, we should always prefer a more consistent, reliable prediction rather than occasional large deviations. Comparing to Random Forest and XGBoost, linear regression model is slightly better, given its balance of interpretability, stability and lowerst large-error penalty.
+
+For hospital applications, consistency and interpretability are critical. While non-linear models like Random Forest and XGBoost can capture complex interactions, Linear Regression offers a transparent and stable predictive approach with minimal large errors.
+
+Therefore, Linear Regression is the preferred model for this dataset — it explains 68.2 percemt of the variation in hospital stay length and maintains balanced predictive reliability, supporting informed decision-making for hospital management and patient care planning.
 
 6) References (if any)
+
+Scikit-learn Documentation: https://scikit-learn.org/stable/
+
+XGBoost Documentation: https://xgboost.readthedocs.io/
+
+Matplotlib and Seaborn Visualization Libraries
+
+Synthetic Healthcare Dataset (Course-provided / generated dataset
