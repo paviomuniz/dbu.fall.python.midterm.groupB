@@ -1,0 +1,17 @@
+1) Introduction to the Dataset
+This dataset is a synthetic dataset for healthcare risk factor analysis. It originally  ontains 30,000 records and 20 features related to individuals' health conditions. The goal of our project is to develop a predictive model that can estimate how long (days) a patient is likely to stay in the hospital. The prediction is aim to improve patient flow and operational efficiency, as hospitals operate with limited resources such as beds, staff, medical equipments,etc.
+
+2) Data Cleaning & Preprocessing Steps
+We did missing data check, duplicates data check. There are 4500 records with missing data, and we removed those missing data. Because medical condition is a highly related feature, it doesn't has any pattern, imputing missing data might impact the accurate.
+
+3) EDA & Key Insights
+We conclude that the medical condition influence the days of stay most of the time, and Cancer is the top conditoin fature that define the number of days in hospital.  
+
+4) Model Building & Evaluation
+We trained models with 3 different ML algorithms. Since the predictive variable of our project is length of days, which is a numerical feature. We selected random forest, linear regression and XGBoost (Extreme Gradient Boosting).
+We use MAE (Mean Absolute Error), RMSE (Root Mean Squared Error) and R^2 (Coefficient of Determination) as three result evaluation metrics. Random Forest model has the lowest MAE (1.2389), which means on average it predicts slightly closer to true values than the rest of two. Linear Regression has the lowest RMSE (1.5768), which means its large mistakes are less than the other two. Linear regression is also has the highest R^2 (0.682), which means 68.2% variation in hospital stay length.
+
+5) Conclusion
+Considering it is designed for hospital, we should always prefer a more consistent, reliable prediction rather than occasional large deviations. Comparing to Random Forest and XGBoost, linear regression model is slightly better, given its balance of interpretability, stability and lowerst large-error penalty.
+
+6) References (if any)
